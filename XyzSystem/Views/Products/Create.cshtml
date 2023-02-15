@@ -1,10 +1,8 @@
-﻿@using XyzSystem.Models.Domain;
-@model XyzSystem.Models.Domain.Product
+﻿@model XyzSystem.ViewModels.ProductViewModel
 
 @{
     ViewData["Title"] = "Create";
-    CategoryProduct categoryProduct = new CategoryProduct();
-
+}
 
 <h1>Create</h1>
 
@@ -15,26 +13,28 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <label asp-for="Product.Description" class="control-label"></label>
+                <input asp-for="Product.Description" class="form-control" />
+                <span asp-validation-for="Product.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="UnitPrice" class="control-label"></label>
-                <input asp-for="UnitPrice" class="form-control" />
-                <span asp-validation-for="UnitPrice" class="text-danger"></span>
+                <label asp-for="Product.UnitPrice" class="control-label"></label>
+                <input asp-for="Product.UnitPrice" class="form-control" />
+                <span asp-validation-for="Product.UnitPrice" class="text-danger"></span>
             </div>
-           @*<div class="form-group">
-                <label asp-for="CategoryProduct." class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
-            </div>*@
+             <div class="form-group">
+                @Html.LabelFor(model=>model.AllCategories,"Category",new {@class="control-label col-md-2"})
+                <div class="col-md-10">
+                    @Html.ListBoxFor(m => m.SelectedCategories, Model.AllCategories)
+                </div>
+            </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
-}
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>

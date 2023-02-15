@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using XyzSystem.Data;
 using XyzSystem.Models.Domain;
+using XyzSystem.ViewModels;
 
 namespace XyzSystem.Controllers
 {
@@ -22,8 +24,7 @@ namespace XyzSystem.Controllers
         // GET: Products
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Products.Include(p => p.CategoryProducts).ThenInclude(p => p.Category);
-            return View(await applicationDbContext.ToListAsync());
+              return View(await _context.Products.Include(x => x.Categories). ToListAsync());
         }
 
         // GET: Products/Details/5
@@ -35,7 +36,6 @@ namespace XyzSystem.Controllers
             }
 
             var product = await _context.Products
-                .Include(p => p.CategoryProducts).ThenInclude(p => p.Category)
                 .FirstOrDefaultAsync(m => m.ProductCode == id);
             if (product == null)
             {
@@ -46,10 +46,17 @@ namespace XyzSystem.Controllers
         }
 
         // GET: Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName");
-            return View();
+            var productViewModel = new ProductViewModel();
+
+            var allJobTagsList = await _context.Categories.ToListAsync();
+            productViewModel.AllCategories = allJobTagsList.Select(o => new SelectListItem
+            {
+                Text = o.CategoryName,
+                Value = o.CategoryId.ToString()
+            });
+            return View(productViewModel);
         }
 
         // POST: Products/Create
@@ -57,17 +64,20 @@ namespace XyzSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ProductCode,Description,UnitPrice,CategoryId")] Product product)
+        public async Task<IActionResult> Create([Bind("SelectedCategories,Product")] ProductViewModel productViewModel)
         {
-            
+            productViewModel.Product.Categories ??= new();
+            foreach (var categoryId in productViewModel.SelectedCategories ?? new())
+            {
+                productViewModel.Product.Categories.Add(await _context.Categories.SingleAsync(b => b.CategoryId == categoryId));
+            }
             if (ModelState.IsValid)
             {
-                _context.Add(product);
+                _context.Add(productViewModel.Product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product);
-            return View(product);
+            return View(productViewModel);
         }
 
         // GET: Products/Edit/5
@@ -78,13 +88,24 @@ namespace XyzSystem.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var productViewModel = new ProductViewModel
+            {
+                Product = await _context.Products.Include(i => i.Categories).FirstAsync(i => i.ProductCode == id),
+            };
+
+            if (productViewModel.Product == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product);
-            return View(product);
+
+            var allJobTagsList = await _context.Categories.ToListAsync();
+            productViewModel.AllCategories = allJobTagsList.Select(o => new SelectListItem
+            {
+                Text = o.CategoryName,
+                Value = o.CategoryId.ToString()
+            });
+
+            return View(productViewModel);
         }
 
         // POST: Products/Edit/5
@@ -92,23 +113,39 @@ namespace XyzSystem.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ProductCode,Description,UnitPrice,CategoryId")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("SelectedCategories,Product")] ProductViewModel productViewModel)
         {
-            if (id != product.ProductCode)
+            if (id != productViewModel.Product.ProductCode)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
+                productViewModel.SelectedCategories ??= new();
                 try
                 {
-                    _context.Update(product);
+                    _context.Update(productViewModel.Product);
+
+                    _context.Entry(productViewModel.Product)
+                        .Collection(b => b.Categories)
+                        .Load();
+
+                    productViewModel.Product.Categories ??= new();
+                    productViewModel.Product.Categories.Clear();
+
+                    await _context.SaveChangesAsync();
+
+                    foreach (var categoryId in productViewModel.SelectedCategories)
+                    {
+                        productViewModel.Product.Categories.Add(await _context.Categories.SingleAsync(b => b.CategoryId == categoryId));
+                    }
+
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!ProductExists(product.ProductCode))
+                    if (!ProductExists(productViewModel.Product.ProductCode))
                     {
                         return NotFound();
                     }
@@ -119,8 +156,7 @@ namespace XyzSystem.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "CategoryName", product);
-            return View(product);
+            return View(productViewModel);
         }
 
         // GET: Products/Delete/5
@@ -132,7 +168,6 @@ namespace XyzSystem.Controllers
             }
 
             var product = await _context.Products
-                .Include(p => p.CategoryProducts).ThenInclude(p => p.Category)
                 .FirstOrDefaultAsync(m => m.ProductCode == id);
             if (product == null)
             {

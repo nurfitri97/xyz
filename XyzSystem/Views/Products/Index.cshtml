@@ -18,13 +18,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.UnitPrice)
             </th>
-       @*     <th>
-                @foreach (var category in model.CategoryProducts)
-                {
-                    
-                }
+            <th>
                 @Html.DisplayNameFor(model => model.Categories)
-            </th>*@
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -37,9 +33,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.UnitPrice)
             </td>
-         @*   <td>
-                @Html.DisplayFor(modelItem => item.Categories.CategoryName)
-            </td>*@
+                <td>
+                    @Html.ListBox("Category", new SelectList(item.Categories,"CategoryId","CategoryName"))
+                </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ProductCode">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.ProductCode">Details</a> |

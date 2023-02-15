@@ -10,6 +10,6 @@ namespace XyzSystem.Models.Domain
         [Required(ErrorMessage = "Category Name is required")]
         public string? CategoryName { get; set; }
 
-        public List<CategoryProduct>? CategoryProducts { get; set;}
+        public List<Product>? Products { get; set;}
     }
 }

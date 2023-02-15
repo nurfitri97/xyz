@@ -12,6 +12,6 @@ namespace XyzSystem.Models.Domain
         public float UnitPrice { get; set; }
         
 
-        public List<CategoryProduct>? CategoryProducts { get; set; }
+        public List<Category>? Categories { get; set; }
     }
 }
