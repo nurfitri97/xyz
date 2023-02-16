@@ -3,7 +3,8 @@
 @{
     ViewData["Title"] = "Create";
 }
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.css">
+<script src="https://cdn.jsdelivr.net/gh/bbbootstrap/libraries@main/choices.min.js"></script>
 <h1>Create</h1>
 
 <h4>Product</h4>
@@ -23,9 +24,14 @@
                 <span asp-validation-for="Product.UnitPrice" class="text-danger"></span>
             </div>
              <div class="form-group">
-                @Html.LabelFor(model=>model.AllCategories,"Category",new {@class="control-label col-md-2"})
+                @*<select asp-for="CategoryID" class="form-control" asp-items="ViewBag.CategoryID" id="choices-multiple-remove-button" placeholder="Select upto 5 tags" multiple></select>*@
+
+                @Html.LabelFor(model=>model.AllCategories,"Category",new {@class="form-control"})
                 <div class="col-md-10">
                     @Html.ListBoxFor(m => m.SelectedCategories, Model.AllCategories)
+               @* @Html.(model=>model.AllCategories,"Category",new {@class="form-control"})
+                <div class="col-md-10">
+                    @Html.ListBoxFor(m => m.SelectedCategories, Model.AllCategories)*@
                 </div>
             </div>
             <div class="form-group">

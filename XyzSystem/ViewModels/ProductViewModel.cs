@@ -21,5 +21,7 @@ namespace XyzSystem.ViewModels
             }
             set { _selectedCategories = value; }
         }
+        public int? categoryId { get; set; }
+       
     }
 }

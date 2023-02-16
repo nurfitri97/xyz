@@ -9,6 +9,14 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+    <p>
+        Find by Category: @Html.TextBox("categoryId")
+        <input type="submit" value="Filter" />
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -31,7 +39,7 @@
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UnitPrice)
+                    @item.UnitPrice.ToString("F2")
             </td>
                 <td>
                     @Html.ListBox("Category", new SelectList(item.Categories,"CategoryId","CategoryName"))

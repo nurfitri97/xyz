@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using XyzSystem.Data;
 using XyzSystem.Models.Domain;
 using XyzSystem.ViewModels;
@@ -22,9 +23,54 @@ namespace XyzSystem.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? categoryId)
         {
-              return View(await _context.Products.Include(x => x.Categories). ToListAsync());
+
+
+            IQueryable<Product> products = _context.Products;
+
+            if (categoryId != null)
+            {
+                products = products.Where(p => p.Categories.Any(c => c.CategoryId == categoryId))
+                                   .Include(x => x.Categories);
+            }
+            else
+            {
+                products = products.Include(x => x.Categories);
+            }
+
+            return View(await products.ToListAsync());
+            //IQueryable<Product> products = _context.Products;
+
+            //if (categoryId != null)
+            //{
+            //    products = products.Where(p => p.Categories.Any(c => c.CategoryId == categoryId))
+            //                       .Include(x => x.Categories);
+            //}
+            //else
+            //{
+            //    products = products.Include(x => x.Categories);
+            //}
+
+            //if (!String.IsNullOrEmpty(searchString))
+            //{
+            //    products = products.Where(p => p.Description.Contains(searchString));
+            //}
+
+            //var productViewModels = new List<ProductViewModel>();
+            //foreach (var product in products)
+            //{
+            //    var productViewModel = new ProductViewModel
+            //    {
+            //        Product = product,
+            //        AllCategories = new SelectList(_context.Categories, "CategoryId", "CategoryName"),
+            //        categoryId = categoryId // pass categoryId to the view
+            //    };
+            //    productViewModels.Add(productViewModel);
+            //}
+
+            //return View(productViewModels);
+            //return View(await _context.Products.Include(x => x.Categories).ToListAsync());
         }
 
         // GET: Products/Details/5
