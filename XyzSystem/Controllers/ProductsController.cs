@@ -46,8 +46,8 @@ namespace XyzSystem.Controllers
                 Value = o.CategoryId.ToString()
             });
             model.products = products.ToList();
-            ViewBag.AllCategories = a.ToList();
-            return View();
+            model.AllCategories = a.ToList();
+            return View(model);
             //return View(await products.ToListAsync());
             //IQueryable<Product> products = _context.Products;
 

@@ -20,7 +20,7 @@
 {
     <p>
         @*Find by Category: @Html.DropDownListFor(m=>m.First().categoryId, Model.First().AllCategories as SelectList, "All")*@
-        Find by Category : @Html.DropDownListFor(m=>m.CategoryId, ViewBag.AllCategories as SelectList,"All")
+        Find by Category : @Html.DropDownListFor(m => m.CategoryId, Model.AllCategories ?? new List<SelectListItem>(),"All")
         <input type="submit" value="Filter" />
     </p>
 }
