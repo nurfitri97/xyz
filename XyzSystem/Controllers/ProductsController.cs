@@ -28,7 +28,8 @@ namespace XyzSystem.Controllers
 
 
             IQueryable<Product> products = _context.Products;
-
+            ProductListViewModel model = new ProductListViewModel();
+            
             if (categoryId != null)
             {
                 products = products.Where(p => p.Categories.Any(c => c.CategoryId == categoryId))
@@ -38,8 +39,16 @@ namespace XyzSystem.Controllers
             {
                 products = products.Include(x => x.Categories);
             }
-
-            return View(await products.ToListAsync());
+            var allJobTagsList = await _context.Categories.ToListAsync();
+            var a = allJobTagsList.Select(o => new SelectListItem
+            {
+                Text = o.CategoryName,
+                Value = o.CategoryId.ToString()
+            });
+            model.products = products.ToList();
+            ViewBag.AllCategories = a.ToList();
+            return View();
+            //return View(await products.ToListAsync());
             //IQueryable<Product> products = _context.Products;
 
             //if (categoryId != null)

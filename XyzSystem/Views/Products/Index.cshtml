@@ -1,4 +1,4 @@
-﻿@model IEnumerable<XyzSystem.Models.Domain.Product>
+﻿@model XyzSystem.ViewModels.ProductListViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -9,31 +9,38 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-@using (Html.BeginForm())
+@*@using (Html.BeginForm())
 {
     <p>
         Find by Category: @Html.TextBox("categoryId")
         <input type="submit" value="Filter" />
     </p>
+}*@
+@using (Html.BeginForm())
+{
+    <p>
+        @*Find by Category: @Html.DropDownListFor(m=>m.First().categoryId, Model.First().AllCategories as SelectList, "All")*@
+        Find by Category : @Html.DropDownListFor(m=>m.CategoryId, ViewBag.AllCategories as SelectList,"All")
+        <input type="submit" value="Filter" />
+    </p>
 }
-
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.products.First().Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UnitPrice)
+                @Html.DisplayNameFor(model => model.products.First().UnitPrice)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Categories)
+                @Html.DisplayNameFor(model => model.products.First().Categories)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.products) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
